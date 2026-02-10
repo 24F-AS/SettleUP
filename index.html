@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SettleUp 💸</title>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #c3ecf9, #a7bfe8);
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: #fff;
+      padding: 30px 35px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      animation: fadeIn 0.5s ease;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #333;
+      margin-top: 0;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    input[type="text"], input[type="email"], input[type="password"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
+
+    .btn-primary {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      font-size: 15px;
+      transition: background-color 0.25s ease;
+    }
+    .btn-primary:hover { background-color: #45a049; }
+
+    .btn-secondary {
+      background-color: #e0e0e0;
+      color: #333;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      font-size: 15px;
+    }
+
+    .btn-logout {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #555;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .group-list { list-style: none; padding: 0; }
+    .group-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      margin-bottom: 8px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    .group-list button {
+      width: auto;
+      padding: 6px 12px;
+      font-size: 0.9em;
+      margin-left: 5px;
+    }
+
+    .message-box {
+      text-align: center;
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background: #f1f1f1;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      html, body {
+        align-items: flex-start;
+        background: #e8f0fe;
+        padding: 20px;
+      }
+      .container { margin-top: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>SettleUp 💸</h1>
+
+    <!-- Home View -->
+    <div id="homeView" class="view active">
+      <h2>Welcome!</h2>
+      <button class="btn-primary" onclick="showView('registerView')">Sign Up</button>
+      <button class="btn-secondary" onclick="showView('loginView')">Login</button>
+    </div>
+
+    <!-- Register View -->
+    <div id="registerView" class="view">
+      <h2>Register Account</h2>
+      <form id="registerForm">
+        <input type="text" id="regName" placeholder="Name" required />
+        <input type="email" id="regEmail" placeholder="Email" required />
+        <input type="password" id="regPassword" placeholder="Password" required />
+        <button type="submit" id="signupButton" class="btn-primary">Sign Up</button>
+      </form>
+      <div id="registerMessage" class="message-box" style="display: none;"></div>
+      <a href="#" class="back-link" onclick="showView('homeView'); return false;">← Back to Home</a>
+    </div>
+
+    <!-- Login View -->
+    <div id="loginView" class="view">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email" required />
+        <input type="password" id="loginPassword" placeholder="Password" required />
+        <button type="submit" id="loginButton" class="btn-primary">Login</button>
+      </form>
+      <div id="loginMessage" class="message-box" style="display: none;"></div>
+      <a href="#" class="back-link" onclick="showView('homeView'); return false;">← Back to Home</a>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboardView" class="view">
+      <h2 id="welcomeHeader">Welcome!</h2>
+      <button class="btn-primary" onclick="showView('groupView')">Create New Group</button>
+      <button class="btn-primary btn-logout" onclick="handleLogout()">Logout</button>
+      <hr style="margin: 20px 0;">
+      <h3>My Groups</h3>
+      <ul id="groupsList" class="group-list">
+        <p id="noGroupsMessage">Loading groups...</p>
+      </ul>
+    </div>
+
+    <!-- Create Group View -->
+    <div id="groupView" class="view">
+      <h2>Create Group</h2>
+      <form id="createGroupForm">
+        <input type="text" id="groupName" placeholder="Enter Group Name (e.g., Goa Trip)" required />
+        <button type="submit" id="createGroupButton" class="btn-primary">Create Group</button>
+      </form>
+      <div id="groupMessage" class="message-box" style="display: none;"></div>
+      <a href="#" class="back-link" onclick="showView('dashboardView'); return false;">← Back</a>
+    </div>
+
+    <!-- Add Member View -->
+    <div id="addMemberView" class="view">
+      <h2 id="addMemberHeader">Add Member</h2>
+      <form id="addMemberForm">
+        <input type="email" id="memberEmail" placeholder="Member's Email Address" required />
+        <input type="hidden" id="currentGroupId" />
+        <input type="hidden" id="currentGroupName" />
+        <button type="submit" id="addMemberButton" class="btn-primary">Add Member</button>
+      </form>
+      <div id="memberMessage" class="message-box" style="display: none;"></div>
+      <a href="#" class="back-link" onclick="showView('dashboardView'); return false;">← Back</a>
+    </div>
+
+    <!-- Add Expense View -->
+    <div id="expenseView" class="view">
+      <h2 id="expenseHeader">Add Expense to [Group]</h2>
+      <form id="addExpenseForm">
+        <input type="text" id="expenseDesc" placeholder="Description" required />
+        <input type="number" id="expenseAmount" placeholder="Amount" required />
+        <button type="submit" id="addExpenseButton" class="btn-primary">Add Expense</button>
+      </form>
+      <div id="expenseMessage" class="message-box" style="display: none;"></div>
+
+      <button class="btn-secondary" onclick="fetchExpenses()">View Expenses</button>
+      <div id="expenseList"></div>
+
+      <button class="btn-primary" onclick="settleUp()">💰 Settle Up</button>
+      <div id="settleResult"></div>
+
+      <a href="#" class="back-link" onclick="showView('dashboardView'); return false;">← Back</a>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+    let currentUser = null;
+    let currentGroupId = null;
+    let lastSettlements = [];
+
+    function showView(id) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function showMessage(id, msg, isError = false) {
+      const box = document.getElementById(id);
+      box.textContent = msg;
+      box.className = 'message-box ' + (isError ? 'error' : 'success');
+      box.style.display = 'block';
+      setTimeout(() => (box.style.display = 'none'), 4000);
+    }
+
+    // Register
+    document.getElementById('registerForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const name = regName.value, email = regEmail.value, password = regPassword.value;
+      try {
+        const res = await fetch(`${API}/users/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showMessage('registerMessage', data.message, false);
+          setTimeout(() => showView('loginView'), 1500);
+        } else showMessage('registerMessage', data.message, true);
+      } catch {
+        showMessage('registerMessage', 'Network error.', true);
+      }
+    });
+
+    // Login
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = loginEmail.value, password = loginPassword.value;
+      try {
+        const res = await fetch(`${API}/users/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser = { userId: data.userId, name: data.name };
+          await loadGroups();
+          showView('dashboardView');
+        } else showMessage('loginMessage', data.message, true);
+      } catch {
+        showMessage('loginMessage', 'Network error.', true);
+      }
+    });
+
+    async function loadGroups() {
+      const res = await fetch(`${API}/groups/mygroups?userId=${currentUser.userId}`);
+      const data = await res.json();
+      const list = document.getElementById('groupsList');
+      list.innerHTML = '';
+      if (!data.length) {
+        list.innerHTML = '<p>No groups yet.</p>';
+        return;
+      }
+      data.forEach(g => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${g.group_name}</span>
+          <div>
+            <button class="btn-primary" onclick="openAddMember(${g.group_id}, '${g.group_name}')">+ Member</button>
+            <button class="btn-secondary" onclick="openExpense(${g.group_id}, '${g.group_name}')">💰 Expenses</button>
+          </div>`;
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById('createGroupForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const groupName = document.getElementById('groupName').value.trim();
+      const res = await fetch(`${API}/groups/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ groupName, createdBy: currentUser.userId })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showMessage('groupMessage', data.message, false);
+        await loadGroups();
+        setTimeout(() => showView('dashboardView'), 1500);
+      } else showMessage('groupMessage', data.message, true);
+    });
+
+    function openAddMember(id, name) {
+      currentGroupId = id;
+      document.getElementById('addMemberHeader').textContent = `Add Member to ${name}`;
+      showView('addMemberView');
+    }
+
+    document.getElementById('addMemberForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = memberEmail.value.trim();
+      const res = await fetch(`${API}/groups/addmember`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ groupId: currentGroupId, memberEmail: email, addedBy: currentUser.userId })
+      });
+      const data = await res.json();
+      if (res.ok) showMessage('memberMessage', data.message, false);
+      else showMessage('memberMessage', data.message, true);
+    });
+
+    function openExpense(id, name) {
+      currentGroupId = id;
+      document.getElementById('expenseHeader').textContent = `Add Expense to ${name}`;
+      document.getElementById('expenseList').innerHTML = '';
+      document.getElementById('settleResult').innerHTML = '';
+      showView('expenseView');
+    }
+
+    // Add Expense – backend handles split
+    document.getElementById('addExpenseForm').addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const desc = document.getElementById('expenseDesc').value.trim();
+      const amt = parseFloat(document.getElementById('expenseAmount').value);
+
+      if (!desc || isNaN(amt) || amt <= 0) {
+        showMessage('expenseMessage', 'Please enter a valid description and amount.', true);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API}/expenses/add`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            group_id: currentGroupId,
+            paid_by: currentUser.userId,
+            description: desc,
+            amount: amt
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          showMessage('expenseMessage', data.message, false);
+        } else {
+          showMessage('expenseMessage', data.error || 'Error adding expense', true);
+        }
+      } catch (err) {
+        console.error(err);
+        showMessage('expenseMessage', 'Network or server error while adding expense.', true);
+      }
+    });
+
+    async function fetchExpenses() {
+      if (!currentGroupId) return;
+      const res = await fetch(`${API}/groups/${currentGroupId}/expenses`);
+      const data = await res.json();
+      const container = document.getElementById('expenseList');
+
+      if (!data.length) {
+        container.innerHTML = '<p>No expenses yet.</p>';
+        return;
+      }
+
+      let html = `
+        <table>
+          <tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Paid By</th>
+            <th>Date</th>
+          </tr>
+      `;
+
+      data.forEach(e => {
+        const dateText = e.date_created
+          ? new Date(e.date_created).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+          : '-';
+        html += `
+          <tr>
+            <td>${e.description}</td>
+            <td>₹${parseFloat(e.amount).toFixed(2)}</td>
+            <td>${e.paid_by_name || 'Unknown'}</td>
+            <td>${dateText}</td>
+          </tr>
+        `;
+      });
+
+      html += '</table>';
+      container.innerHTML = html;
+    }
+
+    async function settleUp() {
+      if (!currentGroupId) return;
+      const res = await fetch(`${API}/expenses/settle/${currentGroupId}`);
+      const data = await res.json();
+      const resultDiv = document.getElementById('settleResult');
+
+      lastSettlements = Array.isArray(data) ? data : [];
+
+      if (!lastSettlements.length) {
+        resultDiv.innerHTML = '<p>No balances to settle!</p>';
+        return;
+      }
+
+      let html = '<h4>Settlement Summary:</h4><ul>';
+      lastSettlements.forEach((s, idx) => {
+        html += `<li>${s.fromName} → ${s.toName}: ₹${s.amount.toFixed(2)}
+                   <button style="margin-left:8px;" onclick="settleTransaction(${idx})">Settle</button>
+                 </li>`;
+      });
+      html += '</ul>';
+      resultDiv.innerHTML = html;
+    }
+
+    async function settleTransaction(index) {
+      const s = lastSettlements[index];
+      if (!s) return;
+
+      const confirmText = `Mark as settled: ${s.fromName} → ${s.toName} ₹${s.amount.toFixed(2)} ?`;
+      if (!confirm(confirmText)) return;
+
+      try {
+        const res = await fetch(`${API}/expenses/settle-payment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            group_id: currentGroupId,
+            fromUserId: s.fromId,
+            toUserId: s.toId,
+            amount: s.amount,
+            fromName: s.fromName,
+            toName: s.toName
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          showMessage('expenseMessage', data.message || 'Settlement recorded.', false);
+          await settleUp();
+          await fetchExpenses();
+        } else {
+          showMessage('expenseMessage', data.error || 'Error recording settlement.', true);
+        }
+      } catch (err) {
+        console.error('Error calling settle-payment:', err);
+        showMessage('expenseMessage', 'Network/server error while recording settlement.', true);
+      }
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      currentGroupId = null;
+      showView('homeView');
+    }
+  </script>
+</body>
+</html>
